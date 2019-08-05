@@ -14,15 +14,16 @@ class ImgAsync: AsyncTask<String, String, String>(){
     override fun doInBackground(vararg params: String): String {
         var str ="0"
         var req ="apple"
+        var page = params[2]
         req = params[1]
         lateinit var ak:String
         lateinit var jsonobj:JSONObject
         try {
-            val text = URLEncoder.encode(params[0], "UTF-8")
             val apiURL = "https://dapi.kakao.com/v2/search/image"
             var urlbuilder:HttpUrl.Builder=HttpUrl.parse(apiURL)!!.newBuilder()
             urlbuilder.addQueryParameter("query", req)
             urlbuilder.addQueryParameter("size", 10.toString())
+            urlbuilder.addQueryParameter("page",page)
 
 
             //val url = URL(apiURL)

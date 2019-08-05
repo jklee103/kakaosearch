@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="listContent" type="com.example.gsontest.Img"/>
+    </data>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <ImageView
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center"
+                android:id="@+id/image_url"
+                app:image_url="@{listContent.image_url}"
+                android:layout_width="80dp"
+                android:scaleType="centerInside"
+                tools:src="@mipmap/ic_launcher"
+                android:layout_height="80dp"/>
+        <TextView
+                android:layout_gravity="center"
+                android:id="@+id/doc_url"
+                android:text="@{listContent.display_sitename}"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="8dp"
+                tools:text="과자"
+                android:layout_height="wrap_content"/>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="#666666"/>
+    </LinearLayout>
+</layout>

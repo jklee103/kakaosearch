@@ -10,3 +10,16 @@ data class Img(
     var doc_url: String,
     var datetime: String
 )
+
+fun getProgressItem(): Img {
+    return Img(
+        "progress"
+        , "progress"
+        , "progress"
+        , "progress"
+        , "progress"
+        , "progress"
+        , "progress"
+        , "progress"
+    )
+}
