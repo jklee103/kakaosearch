@@ -1,6 +1,8 @@
 package com.example.gsontest
 
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +11,13 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gsontest.databinding.ItemContentBinding
 
-class ItemAdapter(val context: Context,val itemlist:ArrayList<Img>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ItemAdapter(val context: Context, val itemlist: ArrayList<Img>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var VIEW_TYPE_ITEM = 0
     var VIEW_TYPE_LOADING = 1
 
@@ -25,62 +29,88 @@ class ItemAdapter(val context: Context,val itemlist:ArrayList<Img>): RecyclerVie
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if(viewType==VIEW_TYPE_ITEM) {
+        if (viewType == VIEW_TYPE_ITEM) {
             val binding = ItemContentBinding.inflate(LayoutInflater.from(context), parent, false)
-            return ViewHolder(binding)
-        }else{
+            return ViewHolder(binding).apply {
+                itemView.setOnClickListener {
+                    val intent = Intent(context as MainActivity, DetailActivity::class.java).apply {
+                        putExtra("doc_url", itemlist.get(adapterPosition).doc_url)
+                        putExtra("width", itemlist.get(adapterPosition).width)
+                        putExtra("height", itemlist.get(adapterPosition).height)
+                        putExtra("datetime", itemlist.get(adapterPosition).datetime)
+                    }
+                    context.startActivity(intent)
+//                    val fragment = DetailFragment.getInstance().apply {
+//                        arguments=Bundle().apply {
+//                            putString("doc_url", itemlist.get(adapterPosition).doc_url)
+//                            putString("width", itemlist.get(adapterPosition).width)
+//                            putString("height", itemlist.get(adapterPosition).height)
+//                            putString("datetime", itemlist.get(adapterPosition).datetime)
+//                        }
+//                    }
+//                    val transaction = (context as MainActivity).supportFragmentManager.beginTransaction()
+                }
+            }
+        } else {
             //로딩중이면 얘반환
-            val view = LayoutInflater.from(context).inflate(R.layout.item_progress,parent, false)
+            val view = LayoutInflater.from(context).inflate(R.layout.item_progress, parent, false)
             return progressHolder(view)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = itemlist[position]
-        if(item.image_url!="progress")
+        if (item.image_url != "progress")
             (holder as ViewHolder).bind(item)
-
     }
 
 
     override fun getItemCount(): Int {
         return itemlist.size
     }
-    fun addprogress(position: Int=itemlist.size){
-        if(position==0)//topscroll
-            itemlist.add(position,getProgressItem())
+
+    fun addprogress(position: Int = itemlist.size) {
+        if (position == 0)//topscroll
+            itemlist.add(position, getProgressItem())
         else//bottom
             itemlist.add(getProgressItem())
     }
-    fun removeprogress(position: Int=itemlist.size-1){
+
+    fun removeprogress(position: Int = itemlist.size - 1) {
         itemlist.removeAt(position)
         notifyItemRemoved(position)
     }
 
-    fun replaceAll(items:ArrayList<Img>){
+    fun replaceAll(items: ArrayList<Img>) {
         itemlist.apply {
             clear()
             addAll(items)
             notifyDataSetChanged()
         }
     }
-    fun addAll(items:ArrayList<Img>){
+
+    fun addAll(items: ArrayList<Img>) {
         itemlist.apply {
             addAll(items)
             notifyDataSetChanged()
         }
     }
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         lateinit var binding: ItemContentBinding
-        constructor(binding: ItemContentBinding) : this(binding.root){
+
+        constructor(binding: ItemContentBinding) : this(binding.root) {
             Log.d("ViewHolder", " create")
-            this.binding=binding
+            this.binding = binding
         }
-        fun bind(img: Img){
+
+        fun bind(img: Img) {
             binding.setVariable(BR.listContent, img)
         }
+
     }
-    class progressHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+
+    class progressHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     }
 //  리스트뷰 시절
@@ -106,7 +136,8 @@ class ItemAdapter(val context: Context,val itemlist:ArrayList<Img>): RecyclerVie
 //        return itemlist.size
 //    }
 }
+
 @BindingAdapter("image_url")
-fun getImg(view:ImageView, url:String){
+fun getImg(view: ImageView, url: String) {
     Glide.with(view.context).load(url).thumbnail(0.5f).into(view)
 }
