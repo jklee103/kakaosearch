@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 import java.util.Arrays.asList
 import com.google.gson.reflect.TypeToken
+import retrofit2.Call
+import retrofit2.Callback
 import kotlin.collections.ArrayList
 
 
@@ -45,26 +47,67 @@ class MainActivity : AppCompatActivity(), CustomScroll.onLoadMore {
         list1.addOnScrollListener(myscroll)
 
         bt.setOnClickListener {
-            gsonconvert(ImgAsync().execute(appkey, et.text.toString(), count.toString()).get())
+            //gsonconvert(ImgAsync().execute(appkey, et.text.toString(), count.toString()).get())
+            //async
+            count=1
+            var imglist = ImgRetrofit(appkey, et.text.toString(), count.toString()).response
+            Log.e("main", "appkey $appkey ")
+            imglist.enqueue(object : Callback<Response?> {
+                override fun onFailure(call: Call<Response?>, t: Throwable) {
+                    Log.e("main", "connection fail")
 
-            adap.replaceAll(getNewData())
+                }
+
+                override fun onResponse(
+                    call: Call<Response?>,
+                    response: retrofit2.Response<Response?>
+                ) {
+                    Log.e("main", "count is $count")
+                    items = response.body()!!.documents
+
+                    adap.replaceAll(getNewData())
+                }
+            })
         }
     }
 
+    fun connect(){
+        var imglist = ImgRetrofit(appkey, et.text.toString(), count.toString()).response
+        Log.e("main", "call connect ")
+        imglist.enqueue(object : Callback<Response?> {
+            override fun onFailure(call: Call<Response?>, t: Throwable) {
+                Log.e("main", "connection fail")
+
+            }
+
+            override fun onResponse(
+                call: Call<Response?>,
+                response: retrofit2.Response<Response?>
+            ) {
+                Log.e("main", "count is $count")
+                items = response.body()!!.documents
+
+            }
+        })
+
+    }
     fun getNewData(): ArrayList<Img> {//TODO 데이터 클릭이벤트에서 옮기기
         Log.d("getNewData()", "currentPage : $count")
         if (items.size != 0) {
-            gsonconvert(ImgAsync().execute(appkey, et.text.toString(), count.toString()).get())
+            //gsonconvert(ImgAsync().execute(appkey, et.text.toString(), count.toString()).get())
+            count++
+            connect()
             return items
         } else
             return (arrayListOf<Img>())
     }
 
     override fun onLoadMore() {
-        count++
+        //count++
         adap.addprogress()
         adap.notifyItemInserted(list1.layoutManager!!.itemCount)
         list1.smoothScrollToPosition(list1.layoutManager!!.itemCount)
+        Log.e("main","load count is $count")
         mainHandler.postDelayed({
             adap.removeprogress()
             val newdata = getNewData()
